@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
                 set.playTogether(yAnim, xAnim);
                 set.start();
 
+                view.addTouch(MotionEventCompat.getPointerId(event, 0), x, y);
+
 //                view.ball.cx = x;
 //                view.ball.cy = y;
 //                view.ball.dx = (x - view.ball.cx)/Math.abs(x - view.ball.cx)*30;
@@ -70,10 +72,29 @@ public class MainActivity extends AppCompatActivity {
                 //Log.v(TAG, "finger move");
 //                view.ball.cx = x;
 //                view.ball.cy = y;
+
+                int pointers = MotionEventCompat.getPointerCount(event);
+                for (int i = 0; i < pointers; i++) {
+                    view.moveTouch(MotionEventCompat.getPointerId(event, i), x, y);
+                }
+
                 return true;
             case (MotionEvent.ACTION_UP) : //lift finger up
+                view.removeId(MotionEventCompat.getPointerId(event, 0));
             case (MotionEvent.ACTION_CANCEL) : //aborted gesture
             case (MotionEvent.ACTION_OUTSIDE) : //outside bounds
+            case (MotionEvent.ACTION_POINTER_DOWN):
+                Log.v(TAG, "another finger down");
+                int downindex = MotionEventCompat.getActionIndex(event);
+                int downid = MotionEventCompat.getPointerId(event, downindex);
+                view.addTouch(downid, event.getX(downid), event.getY(downid));
+                return true;
+            case (MotionEvent.ACTION_POINTER_UP):
+                Log.v(TAG, "another finger up");
+                int upindex = MotionEventCompat.getActionIndex(event);
+                int upid = MotionEventCompat.getPointerId(event, upindex);
+                view.removeId(upid);
+                return true;
             default :
                 return super.onTouchEvent(event);
         }
